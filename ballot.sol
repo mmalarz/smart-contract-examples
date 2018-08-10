@@ -1,4 +1,5 @@
-pragma solidity ^0.4.22;
+pragma experimental ABIEncoderV2;
+pragma solidity ^0.4.25;
 
 contract Ballot {
     struct Voter {
@@ -14,18 +15,18 @@ contract Ballot {
     }
 
     address public chairman;
-    mapping(address => Voter) voters;
+    mapping(address => Voter) public voters;
     Proposal[] public proposals;
 
-    constructor(bytes32[] proposalNames) public {
+    constructor(string[] proposalNames) public {
         chairman = msg.sender;
         voters[chairman].weight = 1;
 
         for (uint i = 0; i < proposalNames.length; i++) {
             proposals.push(
                 Proposal({
-                    name: proposalNames[i],
-                    votes: 0
+                    name : proposalNames[i],
+                    votes : 0
                 })
             );
         }
@@ -61,11 +62,11 @@ contract Ballot {
             "Self delegation is not allowed."
         );
         require(
-            !delegateToVoter.delegate,
+            delegateToVoter.delegate != address(0),
             "Found potentially endless loop in delegation"
         );
 
-        delegateFromUser.voted = true;
+        delegateFromVoter.voted = true;
         delegateToVoter.voted = false;
         delegateToVoter.weight += delegateFromVoter.weight;
     }
@@ -81,9 +82,9 @@ contract Ballot {
         voter.weight = 0;
     }
 
-    function winningProposal() public view returns (uint){
+    function winningProposal() public view returns (uint winningProposal_) {
         uint biggestVoteCount = 0;
-        for (p = 0; p < proposals.length; p++) {
+        for (uint p = 0; p < proposals.length; p++) {
             if (p > biggestVoteCount) {
                 biggestVoteCount = proposals[p].votes;
                 winningProposal_ = p;
