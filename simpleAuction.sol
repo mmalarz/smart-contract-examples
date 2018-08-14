@@ -1,6 +1,6 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.22;
 
-contract simpleAuction {
+contract SimpleAuction {
     address public beneficiary;
     uint public auctionEnd;
     bool ended;
@@ -8,7 +8,7 @@ contract simpleAuction {
     address public highestBidder;
     uint public highestBid;
 
-    mapping(address => uint) pendingReturns;
+    mapping(address => uint) public pendingReturns;
 
     event HighestBidIncreased(address bidder, uint amount);
     event AuctionEnded(address winner, uint amount);
@@ -18,7 +18,7 @@ contract simpleAuction {
         auctionEnd = now + _biddingTime;
     }
 
-    function bid() payable public {
+    function bid() public payable {
         require(
             now <= auctionEnd,
             "The auction has already ended."
